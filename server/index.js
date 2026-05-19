@@ -12,5 +12,5 @@ const anthropic = new Anthropic({apiKey: process.env.ANTHROPIC_API_KEY});
 app.get("/api/health", (req, res) => {res.json({status: "ok"});});
 app.post("/api/quote", async (req, res) => {try {res.json({success: true});} catch (error) {res.status(500).json({success: false, error: error.message});}});
 app.use(express.static("src"));
-app.listen(PORT, () => {console.log(Port );});
+app.listen(PORT, () => {console.log(`Port ${PORT}`);});
 export default app;
