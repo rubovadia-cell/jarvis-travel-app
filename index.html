@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Cotiza viajes con IA y precios reales" />
+    <meta name="theme-color" content="#0066ff" />
+    
+    <title>Jarvis - Cotizador de Viajes IA</title>
+    
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%230066ff' width='192' height='192'/><text x='96' y='140' font-size='120' font-weight='bold' text-anchor='middle' fill='white'>✈</text></svg>" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0066ff;
+            --primary-dark: #0052cc;
+            --secondary: #6c757d;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --border: #dee2e6;
+            --radius: 12px;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        header .emoji {
+            font-size: 3rem;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .form-section {
+            background: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .form-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        input:hover,
+        select:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(0, 102, 255, 0.15);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 14px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 102, 255, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+            border: 1.5px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: var(--secondary);
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 16px 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--danger);
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error.active {
+            display: block;
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        .results-header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .results-header h2 {
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .trip-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            font-size: 0.95rem;
+            color: var(--secondary);
+        }
+
+        .info-item strong {
+            display: block;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .packages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .package-card {
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .package-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .package-card.featured {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #f0f7ff 0%, white 100%);
+        }
+
+        .package-card.featured::before {
+            content: '⭐ RECOMENDADO';
+            display: block;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 8px 16px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .package-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .package-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .package-price {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 15px 0;
+        }
+
+        .package-why {
+            font-size: 0.95rem;
+            color: var(--secondary);
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .package-body {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .breakdown {
+            background: var(--light);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .breakdown-label {
+            color: var(--secondary);
+        }
+
+        .breakdown-value {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .warnings {
+            background: #fff3cd;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border-left: 4px solid var(--warning);
+            font-size: 0.9rem;
+            color: #856404;
+            margin-top: auto;
+        }
+
+        .warnings:empty {
+            display: none;
+        }
+
+        .warning-item {
+            margin: 4px 0;
+        }
+
+        .warning-item::before {
+            content: '⚠️ ';
+            margin-right: 6px;
+        }
+
+        .insights-section {
+            background: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .insights-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 20px;
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .insight-card {
+            background: linear-gradient(135deg, var(--light) 0%, white 100%);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .insight-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: var(--secondary);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .insight-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--secondary);
+        }
+
+        .no-results h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .form-section {
+                padding: 20px;
+            }
+
+            .form-group {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .packages-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px 16px;
+            border-radius: 6px;
+            border-left: 4px solid var(--success);
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .success-message.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>
+                <span class="emoji">✈️</span>
+                Jarvis Travel Quote
+            </h1>
+            <p>Cotiza viajes con IA y precios reales</p>
+        </header>
+
+        <div class="form-section">
+            <form id="searchForm">
+                <div class="form-group">
+                    <div>
+                        <label for="origin">Origen</label>
+                        <input type="text" id="origin" placeholder="ej: CDMX" value="CDMX" required />
+                    </div>
+                    <div>
+                        <label for="destination">Destino</label>
+                        <input type="text" id="destination" placeholder="ej: NYC" value="NYC" required />
+                    </div>
+                    <div>
+                        <label for="departure">Fecha de salida</label>
+                        <input type="date" id="departure" required />
+                    </div>
+                    <div>
+                        <label for="return">Fecha de regreso</label>
+                        <input type="date" id="return" required />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div>
+                        <label for="passengers">Pasajeros</label>
+                        <input type="number" id="passengers" value="1" min="1" max="9" required />
+                    </div>
+                    <div>
+                        <label for="budget">Presupuesto máx (MXN)</label>
+                        <input type="number" id="budget" placeholder="Sin límite" min="0" />
+                    </div>
+                    <div>
+                        <label for="hotelType">Tipo de hospedaje</label>
+                        <select id="hotelType">
+                            <option value="">Cualquiera</option>
+                            <option value="budget">Budget</option>
+                            <option value="standard" selected>Standard</option>
+                            <option value="luxury">Luxury</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn-primary">
+                        🔍 Buscar Viajes
+                    </button>
+                    <button type="reset" class="btn-secondary">
+                        Limpiar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="error" id="error"></div>
+        <div class="success-message" id="success"></div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div class="loading-text">Buscando vuelos, hoteles y analizando con IA...</div>
+            <p style="font-size: 0.9rem; color: #999;">Esto toma aproximadamente 5-10 segundos</p>
+        </div>
+
+        <div class="results-section" id="results">
+            <div class="results-header">
+                <h2>Paquetes encontrados</h2>
+                <div class="trip-info">
+                    <div>
+                        <strong>Ruta</strong>
+                        <span id="resultRoute">-</span>
+                    </div>
+                    <div>
+                        <strong>Fechas</strong>
+                        <span id="resultDates">-</span>
+                    </div>
+                    <div>
+                        <strong>Pasajeros</strong>
+                        <span id="resultPassengers">-</span>
+                    </div>
+                    <div>
+                        <strong>Noches</strong>
+                        <span id="resultNights">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="packages-grid" id="packagesGrid"></div>
+
+            <div class="insights-section">
+                <h3 class="insights-title">💡 Insights de viaje</h3>
+                <div class="insights-grid" id="insightsGrid"></div>
+            </div>
+        </div>
+
+        <div class="no-results" id="noResults" style="display: none;">
+            <h3>👀 Comienza a buscar</h3>
+            <p>Ingresa origen, destino y fechas para ver opciones de viaje</p>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURACIÓN
+        // ============================================
+
+        const API_BASE = window.location.origin;
+        const form = document.getElementById('searchForm');
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        const success = document.getElementById('success');
+        const results = document.getElementById('results');
+        const noResults = document.getElementById('noResults');
+
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+
+        function setDefaultDates() {
+            const today = new Date();
+            const in7 = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+            const in14 = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
+
+            document.getElementById('departure').valueAsDate = in7;
+            document.getElementById('return').valueAsDate = in14;
+        }
+
+        setDefaultDates();
+
+        // ============================================
+        // FORMATEO DE DATOS
+        // ============================================
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('es-MX', {
+                style: 'currency',
+                currency: 'MXN',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+            }).format(value);
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('es-MX', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+            });
+        }
+
+        // ============================================
+        // BÚSQUEDA
+        // ============================================
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const origin = document.getElementById('origin').value.toUpperCase();
+            const destination = document.getElementById('destination').value.toUpperCase();
+            const departure = document.getElementById('departure').value;
+            const returnDate = document.getElementById('return').value;
+            const passengers = parseInt(document.getElementById('passengers').value);
+            const budget = parseInt(document.getElementById('budget').value) || null;
+            const hotelType = document.getElementById('hotelType').value;
+
+            // Validar
+            if (!departure || !returnDate) {
+                showError('Por favor selecciona fechas válidas');
+                return;
+            }
+
+            if (new Date(departure) >= new Date(returnDate)) {
+                showError('La fecha de regreso debe ser posterior a la de salida');
+                return;
+            }
+
+            // Buscar
+            await searchTrips(origin, destination, departure, returnDate, passengers, budget, hotelType);
+        });
+
+        async function searchTrips(origin, destination, departure, returnDate, passengers, budget, hotelType) {
+            hideError();
+            hideSuccess();
+            results.classList.remove('active');
+            noResults.style.display = 'none';
+            loading.classList.add('active');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/quote`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        origin,
+                        destination,
+                        departureDate: departure,
+                        returnDate,
+                        passengers,
+                        maxBudget: budget,
+                        hotelType,
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResults(data);
+                    showSuccess('¡Viaje cotizado exitosamente!');
+                } else {
+                    throw new Error(data.error || 'Error desconocido');
+                }
+            } catch (err) {
+                showError(`Error: ${err.message}`);
+                console.error('Search error:', err);
+            } finally {
+                loading.classList.remove('active');
+            }
+        }
+
+        // ============================================
+        // MOSTRAR RESULTADOS
+        // ============================================
+
+        function displayResults(data) {
+            // Encabezado
+            document.getElementById('resultRoute').textContent = data.route;
+            document.getElementById('resultDates').textContent =
+                `${formatDate(data.dates.departure)} - ${formatDate(data.dates.return)}`;
+            document.getElementById('resultPassengers').textContent = data.passengers;
+            document.getElementById('resultNights').textContent = data.nights;
+
+            // Paquetes
+            const packagesGrid = document.getElementById('packagesGrid');
+            packagesGrid.innerHTML = '';
+
+            data.packages.forEach((pkg, index) => {
+                const card = document.createElement('div');
+                card.className = `package-card ${pkg.name === 'Recomendada' ? 'featured' : ''}`;
+
+                const breakdown = pkg.breakdown || {};
+                const flight = breakdown.flight || {};
+                const hotel = breakdown.hotel || {};
+
+                card.innerHTML = `
+                    <div class="package-header">
+                        <div class="package-title">${pkg.name}</div>
+                        <div class="package-price">${formatCurrency(pkg.totalPrice)}</div>
+                        <div class="package-why">${pkg.whyChooseThis || ''}</div>
+                    </div>
+                    <div class="package-body">
+                        <div class="breakdown">
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">✈️ Vuelo</span>
+                                <span class="breakdown-value">${formatCurrency(flight.price || 0)}</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">🏨 Hotel</span>
+                                <span class="breakdown-value">${formatCurrency(hotel.totalPrice || 0)}</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">🚕 Transporte</span>
+                                <span class="breakdown-value">${formatCurrency(breakdown.transport || 0)}</span>
+                            </div>
+                        </div>
+                        ${flight.airline ? `<p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">✈️ ${flight.airline} (${flight.duration})</p>` : ''}
+                        ${hotel.name ? `<p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">🏨 ${hotel.name}</p>` : ''}
+                        ${pkg.warnings && pkg.warnings.length > 0 ? `
+                            <div class="warnings">
+                                ${pkg.warnings.map(w => `<div class="warning-item">${w}</div>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+
+                packagesGrid.appendChild(card);
+            });
+
+            // Insights
+            const insightsGrid = document.getElementById('insightsGrid');
+            insightsGrid.innerHTML = '';
+
+            const insights = data.insights || {};
+
+            if (insights.bestValue) {
+                const card = document.createElement('div');
+                card.className = 'insight-card';
+                card.innerHTML = `
+                    <div class="insight-label">👍 Mejor Relación</div>
+                    <div class="insight-value">${insights.bestValue}</div>
+                `;
+                insightsGrid.appendChild(card);
+            }
+
+            if (insights.cheapest) {
+                const card = document.createElement('div');
+                card.className = 'insight-card';
+                card.innerHTML = `
+                    <div class="insight-label">💰 Más Barato</div>
+                    <div class="insight-value">${insights.cheapest}</div>
+                `;
+                insightsGrid.appendChild(card);
+            }
+
+            if (insights.priceRange) {
+                const card = document.createElement('div');
+                card.className = 'insight-card';
+                card.innerHTML = `
+                    <div class="insight-label">📊 Rango de Precio</div>
+                    <div class="insight-value">${formatCurrency(insights.priceRange.min)}</div>
+                    <div style="font-size: 0.9rem; color: #666; margin-top: 8px;">hasta ${formatCurrency(insights.priceRange.max)}</div>
+                `;
+                insightsGrid.appendChild(card);
+            }
+
+            // Mostrar resultados
+            results.classList.add('active');
+        }
+
+        // ============================================
+        // UTILIDADES
+        // ============================================
+
+        function showError(message) {
+            error.textContent = message;
+            error.classList.add('active');
+        }
+
+        function hideError() {
+            error.classList.remove('active');
+        }
+
+        function showSuccess(message) {
+            success.textContent = message;
+            success.classList.add('active');
+            setTimeout(() => success.classList.remove('active'), 4000);
+        }
+
+        function hideSuccess() {
+            success.classList.remove('active');
+        }
+
+        // Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {
+                // Service worker registration failed, app still works offline
+            });
+        }
+    </script>
+</body>
+</html>

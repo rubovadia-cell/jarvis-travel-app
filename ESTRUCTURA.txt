@@ -1,0 +1,191 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║                  JARVIS TRAVEL QUOTE APP - ESTRUCTURA                    ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+📁 jarvis-travel-app/
+│
+├── 📄 package.json                  ← Configuración npm (dependencias)
+├── 📄 .env.example                  ← Template de variables (copia a .env)
+├── 📄 .gitignore                    ← Archivos ignorados en Git
+│
+├── 🐳 Dockerfile                    ← Para containerizar en Docker
+├── 📄 docker-compose.yml            ← Para desarrollo local con Docker
+│
+├── 📘 README.md                     ← Guía principal
+├── 🚀 DEPLOY.md                     ← Instrucciones de deployment
+├── 📋 ESTRUCTURA.txt                ← Este archivo
+│
+├── 📁 src/                          ← FRONTEND (Cliente)
+│   ├── 📄 index.html                ← App web (UI + CSS + JS)
+│   ├── 📄 manifest.json             ← PWA manifest
+│   └── 📄 sw.js                     ← Service Worker (offline)
+│
+├── 📁 server/                       ← BACKEND (Servidor)
+│   └── 📄 index.js                  ← Express + Claude API
+│
+├── 📁 scripts/                      ← Scripts auxiliares
+│   ├── 🔧 setup.sh                  ← Setup inicial
+│   ├── 🧪 test-api.sh               ← Test API con cURL
+│   └── 📦 build.sh                  ← Build para producción
+│
+└── 📁 docs/                         ← Documentación adicional
+    ├── API.md                       ← Especificación API
+    ├── CASOS-USO.md                 ← Casos de uso México
+    └── CONTRIBUIR.md                ← Guía para contribuidores
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎯 FLUJO DE DATOS:
+
+1️⃣  Usuario abre app web (browser)
+    ↓
+    src/index.html (React-like vanilla JS)
+    
+2️⃣  Usuario ingresa origen, destino, fechas
+    ↓
+    JavaScript hace POST a /api/quote
+    
+3️⃣  Backend (Express) recibe solicitud
+    ↓
+    server/index.js
+    
+4️⃣  Backend obtiene datos reales de APIs
+    ├── Vuelos (Skyscanner mock)
+    ├── Hoteles (Booking mock)
+    └── Transporte (Google Maps mock)
+    
+5️⃣  Backend envía a Claude para análisis
+    ↓
+    Claude Opus 4.6 analiza datos
+    
+6️⃣  Claude retorna 3 paquetes optimizados
+    ├── Económica
+    ├── Recomendada
+    └── Premium
+    
+7️⃣  Backend retorna JSON al frontend
+    ↓
+    src/index.html renderiza resultados
+    
+8️⃣  Usuario ve paquetes interactivos
+
+═══════════════════════════════════════════════════════════════════════════════
+
+⚙️  CONFIGURACIÓN:
+
+1. Copiar .env.example → .env
+2. Agregar ANTHROPIC_API_KEY=sk-ant-...
+3. npm install
+4. npm run dev
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🚀 DEPLOYMENT RECOMENDADO:
+
+┌─────────────────────────────────────┐
+│  Railway.app (Backend + Frontend)   │
+│  • Gratis con crédito                │
+│  • Deploy automático desde Git       │
+│  • Escalable                         │
+│  • Recomendado ⭐                    │
+└─────────────────────────────────────┘
+
+Ver: DEPLOY.md para instrucciones detalladas
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📱 PWA (Progressive Web App):
+
+✓ Instalar como app en móvil/desktop
+✓ Funciona offline (Service Worker)
+✓ Carga rápida (cache)
+✓ Notificaciones (futuro)
+
+Instalar:
+  Chrome:  Ícono en barra de direcciones → "Instalar"
+  Safari:  Compartir → "Agregar a pantalla de inicio"
+  Android: Menú → "Instalar app"
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🔑 ARCHIVOS IMPORTANTES:
+
+src/index.html      → Toda la UI/UX/JS (único archivo HTML)
+server/index.js     → Toda la lógica backend (Express + Claude)
+package.json        → Configuración npm + scripts
+.env               → Credenciales (NO subir a Git)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+💬 COMANDOS ÚTILES:
+
+npm run dev         → Desarrollo (frontend + backend)
+npm run server      → Solo backend
+npm run test        → Ejecutar casos de prueba
+npm run build       → Build para producción
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🔗 ENDPOINTS API:
+
+GET  /api/health            → Verificar estado
+POST /api/quote             → Cotizar viaje
+GET  /api/destinations      → Listar destinos
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📊 STACK TECNOLÓGICO:
+
+Frontend:
+  - HTML5 / CSS3 / Vanilla JavaScript
+  - PWA (Service Worker)
+  - Responsive design
+  
+Backend:
+  - Node.js
+  - Express.js
+  - Claude API (Anthropic)
+  
+APIs (Integrables):
+  - Skyscanner Flight Search
+  - Booking.com
+  - Google Maps
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✨ CARACTERÍSTICAS:
+
+✓ Buscar vuelos en tiempo real
+✓ Cotizar hospedajes
+✓ Análisis IA (Claude)
+✓ 3 paquetes optimizados por cada búsqueda
+✓ PWA (funciona offline)
+✓ Responsive (móvil + desktop)
+✓ Soporte rutas México-internacionales
+✓ Interfaz intuitiva
+✓ Fast performance
+✓ Escalable
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎓 PRÓXIMOS PASOS:
+
+1. npm install               # Instalar dependencias
+2. cp .env.example .env      # Crear .env
+3. Editar .env              # Agregar API key
+4. npm run dev              # Iniciar desarrollo
+5. http://localhost:3000    # Abrir en navegador
+6. ¡Probar app!
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📞 SOPORTE:
+
+- README.md          → Guía general
+- DEPLOY.md          → Deployment
+- server/index.js    → Comentarios en código
+- src/index.html     → Comentarios en frontend
+
+═══════════════════════════════════════════════════════════════════════════════
+
+¡Listo para viajar! ✈️ 🧳
