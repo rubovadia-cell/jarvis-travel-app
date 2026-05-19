@@ -1,0 +1,16 @@
+﻿import Anthropic from "@anthropic-ai/sdk";
+import express from "express";
+import cors from "cors";
+import bodyParser from "body-parser";
+import dotenv from "dotenv";
+dotenv.config();
+const app = express();
+const PORT = process.env.PORT || 3000;
+app.use(cors());
+app.use(bodyParser.json());
+const anthropic = new Anthropic.default({apiKey: process.env.ANTHROPIC_API_KEY});
+app.get("/api/health", (req, res) => {res.json({status: "ok"});});
+app.post("/api/quote", async (req, res) => {try {res.json({success: true});} catch (error) {res.status(500).json({success: false, error: error.message});}});
+app.use(express.static("src"));
+app.listen(PORT, () => {console.log(Port );});
+export default app;
